@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旬彩坊 週次売上レポート</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Sans', 'Meiryo', sans-serif; background: #f5f6fa; color: #333; }
+  header { background: #2C3E50; color: white; padding: 24px 32px; }
+  header h1 { font-size: 22px; font-weight: bold; }
+  header p { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+  .container { max-width: 1100px; margin: 32px auto; padding: 0 24px; }
+  .card { background: white; border-radius: 12px; padding: 28px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .card h2 { font-size: 16px; font-weight: bold; color: #2C3E50; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #ecf0f1; }
+  .chart-wrap { position: relative; height: 320px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .summary-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .summary-card .label { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .summary-card .value { font-size: 24px; font-weight: bold; color: #2C3E50; }
+</style>
+</head>
+<body>
+<header>
+  <h1>旬彩坊 週次売上レポート</h1>
+  <p>生成日時: 2026-04-20 12:38</p>
+</header>
+<div class="container">
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="label">最新週</div>
+      <div class="value">2026-W15</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">最新週 売上合計</div>
+      <div class="value">¥8,885,919</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">集計週数</div>
+      <div class="value">2週</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">累計売上</div>
+      <div class="value">¥17,696,308</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>① 全体の週次売上推移</h2>
+    <div class="chart-wrap"><canvas id="chart1"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>② ソース別の週次売上推移</h2>
+    <div class="chart-wrap"><canvas id="chart2"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>③ 中規模以上企業の週次売上推移</h2>
+    <div class="chart-wrap"><canvas id="chart3"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>④ 個人店舗の週次売上推移</h2>
+    <div class="chart-wrap"><canvas id="chart4"></canvas></div>
+  </div>
+
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+const total = {"labels": ["2026-W14", "2026-W15"], "data": [8810389, 8885919]};
+const source = {"labels": ["2026-W14", "2026-W15"], "datasets": [{"label": "インフォマート", "data": [3742177, 3614723], "borderColor": "#4e9af1", "backgroundColor": "#4e9af133", "tension": 0.3, "fill": false, "pointRadius": 6}, {"label": "タノム", "data": [2394203, 2256308], "borderColor": "#6abf69", "backgroundColor": "#6abf6933", "tension": 0.3, "fill": false, "pointRadius": 6}, {"label": "アスピット", "data": [776614, 736584], "borderColor": "#ffca28", "backgroundColor": "#ffca2833", "tension": 0.3, "fill": false, "pointRadius": 6}, {"label": "販売大臣", "data": [1897395, 2278304], "borderColor": "#f06292", "backgroundColor": "#f0629233", "tension": 0.3, "fill": false, "pointRadius": 6}]};
+const companyLarge = {"labels": ["2026-W14", "2026-W15"], "datasets": [{"label": "株式会社キープウィルダイニング", "data": [1101090, 1089708], "borderColor": "#4e9af1", "backgroundColor": "#4e9af133", "tension": 0.3, "fill": false, "pointRadius": 6}, {"label": "株式会社ゴリラカンパニー", "data": [1294978, 1255338], "borderColor": "#f06292", "backgroundColor": "#f0629233", "tension": 0.3, "fill": false, "pointRadius": 6}, {"label": "アイティープラス", "data": [776614, 736584], "borderColor": "#ffca28", "backgroundColor": "#ffca2833", "tension": 0.3, "fill": false, "pointRadius": 6}, {"label": "いせ久", "data": [394302, 378218], "borderColor": "#6abf69", "backgroundColor": "#6abf6933", "tension": 0.3, "fill": false, "pointRadius": 6}]};
+const companySmall = {"labels": ["2026-W14", "2026-W15"], "datasets": [{"label": "Ｖａｍｏ株式会社", "data": [126627, 105131], "borderColor": "#6abf69", "backgroundColor": "#6abf6933", "tension": 0.3, "fill": false, "pointRadius": 6}, {"label": "望滇山", "data": [112499, 91750], "borderColor": "#ab47bc", "backgroundColor": "#ab47bc33", "tension": 0.3, "fill": false, "pointRadius": 6}, {"label": "株式会社ジャパンダイニング", "data": [48785, 64210], "borderColor": "#26c6da", "backgroundColor": "#26c6da33", "tension": 0.3, "fill": false, "pointRadius": 6}, {"label": "いそいそグループ", "data": [31349, 60017], "borderColor": "#ff7043", "backgroundColor": "#ff704333", "tension": 0.3, "fill": false, "pointRadius": 6}]};
+
+const datalabels = {
+  display: true,
+  align: 'top',
+  anchor: 'end',
+  font: { size: 10 },
+  formatter: v => v > 0 ? '¥' + Math.round(v/10000) + '万' : '',
+  color: '#555',
+};
+
+const lineOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+    datalabels,
+  },
+  scales: { y: { ticks: { callback: v => '¥' + v.toLocaleString() } } }
+};
+
+new Chart(document.getElementById('chart1'), {
+  type: 'line',
+  data: { labels: total.labels, datasets: [{ label: '週次売上合計', data: total.data, borderColor: '#4e9af1', backgroundColor: '#4e9af133', tension: 0.3, fill: true, pointRadius: 6 }] },
+  options: { ...lineOpts, plugins: { legend: { display: false }, datalabels } }
+});
+
+new Chart(document.getElementById('chart2'), { type: 'line', data: source, options: lineOpts });
+new Chart(document.getElementById('chart3'), { type: 'line', data: companyLarge, options: lineOpts });
+new Chart(document.getElementById('chart4'), { type: 'line', data: companySmall, options: lineOpts });
+</script>
+</body>
+</html>
