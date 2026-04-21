@@ -73,7 +73,7 @@
 <body>
 <header>
   <h1>旬彩坊 週次売上レポート</h1>
-  <p>生成日時: 2026-04-21 10:48</p>
+  <p>生成日時: 2026-04-21 11:41</p>
 </header>
 <div class="container">
 
@@ -97,11 +97,11 @@
   </div>
 
   <div class="period-selector">
-    <span>直近：</span>
-    <div id="period-buttons" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+    <button class="period-btn active" id="weekly-btn" onclick="showWeeklyViewAll()">週次取引</button>
     <div class="divider"></div>
     <span>月別：</span>
-    <div id="month-buttons" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+    <select id="month-select" class="period-btn" style="padding:8px 16px;border-radius:20px;border:2px solid #E67E22;color:#E67E22;background:white;font-size:13px;cursor:pointer;font-family:inherit;" onchange="onMonthSelect(this)">
+    </select>
     <div class="divider"></div>
     <button class="period-btn search-btn" id="search-toggle" onclick="showSearchView()">🔍 明細検索</button>
   </div>
@@ -422,32 +422,30 @@ function setActiveBtn(activeBtn) {
   activeBtn.classList.add('active');
 }
 
-// 直近N週ボタン
-const btnContainer = document.getElementById('period-buttons');
-let currentPeriod = Math.min(3, weeks.length);
-for (let n = 1; n <= weeks.length; n++) {
-  const btn = document.createElement('button');
-  btn.className = 'period-btn' + (n === currentPeriod ? ' active' : '');
-  btn.textContent = n + '週目';
-  btn.addEventListener('click', () => {
-    setActiveBtn(btn);
-    showWeeklyView(weeks.slice(-n));
-  });
-  btnContainer.appendChild(btn);
+function showWeeklyViewAll() {
+  setActiveBtn(document.getElementById('weekly-btn'));
+  showWeeklyView(weeks);
 }
 
-// 月別ボタン
-const monthContainer = document.getElementById('month-buttons');
-Object.keys(monthly).forEach(month => {
-  const btn = document.createElement('button');
-  btn.className = 'period-btn month-btn';
-  btn.textContent = month;
-  btn.addEventListener('click', () => {
-    setActiveBtn(btn);
-    showMonthlyView(month);
-  });
-  monthContainer.appendChild(btn);
+// 月別プルダウン
+const monthSelect = document.getElementById('month-select');
+const months = Object.keys(monthly);
+months.forEach(month => {
+  const opt = document.createElement('option');
+  opt.value = month;
+  opt.textContent = month;
+  monthSelect.appendChild(opt);
 });
+if (months.length > 0) {
+  monthSelect.value = months[months.length - 1];
+}
+
+function onMonthSelect(sel) {
+  const month = sel.value;
+  if (!month) return;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  showMonthlyView(month);
+}
 
 // 週次チャート
 const datalabels = {
@@ -562,7 +560,7 @@ function showMonthlyView(month) {
   chart_m3.update();
 }
 
-showWeeklyView(weeks.slice(-currentPeriod));
+showWeeklyView(weeks);
 </script>
 </body>
 </html>
