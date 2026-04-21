@@ -62,7 +62,7 @@
 <body>
 <header>
   <h1>旬彩坊 週次売上レポート</h1>
-  <p>生成日時: 2026-04-21 10:16</p>
+  <p>生成日時: 2026-04-21 10:36</p>
 </header>
 <div class="container">
 
@@ -152,6 +152,7 @@
       </div>
       <div class="search-row">
         <button class="search-btn-run" onclick="runSearch()">検索</button>
+        <button class="search-btn-run" id="csv-btn" onclick="downloadCSV()" style="background:#27AE60;display:none;">CSVダウンロード</button>
       </div>
     </div>
     <div class="card">
@@ -261,6 +262,30 @@ function runSearch() {
       '<td class="num">¥' + r.amount.toLocaleString() + '</td>';
     tbody.appendChild(tr);
   });
+  document.getElementById('csv-btn').style.display = rows.length > 0 ? 'inline-block' : 'none';
+  window._csvRows = rows;
+}
+
+function downloadCSV() {
+  const rows = window._csvRows || [];
+  const from = document.getElementById('date-from').value;
+  const to   = document.getElementById('date-to').value;
+  const store = document.getElementById('store-input').value.trim() || '全店舗';
+  const sep = String.fromCharCode(13, 10);
+  const lines = ['﻿商品名,単価,数量,購入金額'];
+  rows.forEach(r => {
+    const qty = r.qty % 1 === 0 ? r.qty : r.qty.toFixed(2);
+    const name = '"' + r.name.replace(/"/g, '""') + '"';
+    lines.push(name + ',' + r.price + ',' + qty + ',' + r.amount);
+  });
+  const csv = lines.join(sep);
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = store + '_' + from + '_' + to + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 
